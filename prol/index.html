@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Property & User Location Map</title>
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📍 Property & Your Location</h2>
+
+  <!-- Button to get user's location -->
+  <button onclick="getUserLocation()">Get My Location</button>
+  <p id="output"></p>
+
+  <!-- Google Map -->
+  <div id="map"></div>
+
+  <script>
+    let map;
+    let userMarker;
+    let propertyMarker;
+
+    // Initial fixed property location
+    const propertyLocation = { lat: 8.8113152, lng: 78.1451264 };
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 14,
+        center: propertyLocation,
+      });
+
+      // Add marker for the property
+      propertyMarker = new google.maps.Marker({
+        position: propertyLocation,
+        map: map,
+        title: "Property Location",
+        icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+      });
+    }
+
+    function getUserLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            document.getElementById("output").innerText =
+              `📍 Your Location: Latitude ${userLocation.lat}, Longitude ${userLocation.lng}`;
+
+            // Add or update marker for user
+            if (userMarker) {
+              userMarker.setMap(null);
+            }
+
+            userMarker = new google.maps.Marker({
+              position: userLocation,
+              map: map,
+              title: "Your Location",
+              icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+            });
+
+            // Center map to show both locations
+            map.setCenter(userLocation);
+          },
+          function(error) {
+            alert("Error getting location: " + error.message);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        alert("Geolocation not supported.");
+      }
+    }
+  </script>
+
+  <!-- Google Maps API -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9-m-YEN_CBw11hfLt5DoDWRfdDMDS4QY&callback=initMap">
+  </script>
+
+</body>
+</html>
